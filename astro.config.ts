@@ -3,6 +3,8 @@ import { fileURLToPath } from 'node:url';
 
 import icon from 'astro-icon';
 
+import cloudflare from '@astrojs/cloudflare';
+
 const injectedScssPath = fileURLToPath(
   new URL('./src/styles/_inject.scss', import.meta.url),
 ).replaceAll('\\', '/');
@@ -18,10 +20,13 @@ export default defineConfig({
       },
     },
   },
+
   markdown: {
     shikiConfig: {
       theme: 'catppuccin-frappe',
     },
   },
+
   integrations: [icon()],
+  adapter: cloudflare(),
 });
