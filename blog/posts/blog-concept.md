@@ -39,7 +39,7 @@ private: false
 
 ## 사용 흐름
 
-이 템플릿은 [Astro Cream CMS Tools]() VS Code 확장 프로그램과 함께 사용하는 것을 권장합니다.  
+이 템플릿은 [Astro Cream CMS Tools](https://github.com/orbitnoh/astro-cream-cms-tools) VS Code 확장 프로그램과 함께 사용하는 것을 권장합니다.  
 글은 하나지만 frontmatter를 사용하는 곳은 글 마크다운과 `blog/archive.md` 두 곳이기 때문에, 확장 프로그램으로 함께 관리하는 흐름을 전제로 합니다.
 
 확장 프로그램으로 새 글을 만들면 글 마크다운이 생성되고, 동시에 `blog/archive.md`의 `Inbox` 영역에 링크가 자동으로 추가됩니다.  
