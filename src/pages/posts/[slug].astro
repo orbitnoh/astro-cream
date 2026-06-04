@@ -1,0 +1,258 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+
+import PostLayout from '@/layouts/PostLayout.astro';
+import Toc from '@/components/Toc.astro';
+import { formatDateLabel, formatDateTimeAttribute } from '@/utils/format-date';
+import { isPublicPost } from '@/utils/blog-posts';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('blog')).filter(isPublicPost);
+
+  return posts.map((post) => ({
+    params: { slug: post.data.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+---
+
+<PostLayout title={post.data.title}>
+  <div class="post-body" slot="body">
+    <header class="post-body__header">
+      <h1 class="post-body__title">{post.data.title}</h1>
+      <div class="post-body__meta">
+        <Icon class="post-body__date-icon" name="mdi:calendar-blank-outline" />
+        <time class="post-body__date" datetime={formatDateTimeAttribute(post.data.date)}>
+          {formatDateLabel(post.data.date)}
+        </time>
+      </div>
+    </header>
+    <div class="markdown-content" data-markdown-content>
+      <Content />
+    </div>
+  </div>
+
+  <Toc headings={headings} slot="toc" />
+</PostLayout>
+
+<style lang="scss">
+  .post-body {
+    padding: $space-12 0 $space-16;
+
+    @include media-down('lg') {
+      padding: $space-8 0 $space-8;
+    }
+
+    &__title {
+      font-size: $font-size-32;
+
+      @include media-down('sm') {
+        font-size: $font-size-26;
+      }
+    }
+
+    &__meta {
+      display: flex;
+      gap: $space-2;
+      align-items: center;
+      margin-top: $space-3;
+    }
+
+    &__date {
+      color: var(--text-muted);
+      font-size: $font-size-14;
+      letter-spacing: -0.025em;
+    }
+  }
+</style>
+
+<style lang="scss" is:global>
+  .markdown-content {
+    margin-top: $space-10;
+
+    h1 {
+      display: none;
+    }
+
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      scroll-margin-top: $space-8;
+      margin-top: $space-8;
+
+      &::before {
+        content: '|';
+        margin-right: $space-2;
+        color: color-mix(in srgb, var(--accent) 80%, transparent 20%);
+        font-weight: $font-weight-medium;
+      }
+    }
+
+    h2 {
+      font-size: $font-size-26;
+
+      &::before {
+        content: '#';
+      }
+
+      @include media-down('sm') {
+        font-size: $font-size-24;
+      }
+    }
+
+    h3 {
+      font-size: $font-size-22;
+
+      @include media-down('sm') {
+        font-size: $font-size-20;
+      }
+    }
+
+    h4 {
+      font-size: $font-size-20;
+    }
+
+    h5 {
+      font-size: $font-size-18;
+    }
+
+    h6 {
+      color: var(--text-muted);
+      font-size: $font-size-16;
+    }
+
+    p,
+    ul,
+    ol,
+    blockquote,
+    pre,
+    table,
+    figure,
+    hr {
+      margin-top: $space-5;
+    }
+
+    h2 + *,
+    h3 + *,
+    h4 + *,
+    h5 + *,
+    h6 + * {
+      margin-top: $space-4;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-decoration-color: #dbeafe;
+      text-decoration-thickness: 0.12em;
+      text-underline-offset: $space-1;
+      transition: color $transition-duration-1;
+    }
+
+    ul,
+    ol {
+      padding-left: $space-6;
+    }
+
+    ul {
+      list-style: disc;
+    }
+
+    ol {
+      list-style: decimal;
+    }
+
+    li + li {
+      margin-top: $space-2;
+    }
+
+    li > ul,
+    li > ol {
+      margin-top: $space-2;
+    }
+
+    blockquote {
+      padding: $space-4 $space-5;
+      border-left: $space-1 solid var(--accent);
+      background-color: var(--bg-surface);
+      color: var(--text-muted);
+    }
+
+    blockquote > :first-child {
+      margin-top: 0;
+    }
+
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      code {
+        display: inline-block;
+        transform: translateY(-2px);
+      }
+    }
+
+    code:not(pre code) {
+      padding: $space-1 $space-2;
+      background-color: #f1ece0;
+      color: var(--text-heading);
+      font-size: $font-size-14;
+      line-height: $line-height-tight;
+    }
+
+    pre {
+      overflow-x: auto;
+      padding: $space-5;
+      line-height: $line-height-reading;
+    }
+
+    pre code {
+      padding: 0;
+      background-color: transparent;
+      font-size: $font-size-14;
+    }
+
+    img {
+      margin-top: $space-6;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-collapse: collapse;
+      font-size: $font-size-14;
+    }
+
+    th,
+    td {
+      vertical-align: top;
+      padding: $space-3 $space-4;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+
+    th {
+      background-color: #f6f1e7;
+      color: var(--text-heading);
+      font-weight: $font-weight-semibold;
+    }
+
+    tr:nth-child(even) td {
+      background-color: #f7f3ea;
+    }
+
+    hr {
+      height: 1px;
+      border: 0;
+      background-color: var(--border);
+    }
+  }
+</style>

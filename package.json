@@ -1,0 +1,41 @@
+{
+  "name": "astro-cream",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "astro": "astro",
+    "dev": "astro dev",
+    "dev:host": "astro dev --host 0.0.0.0 --port 4321 --allowed-hosts",
+    "dev:public": "concurrently -k -n astro,tunnel \"npm run dev:host\" \"npm run tunnel\"",
+    "tunnel": "npx --yes cloudflared@latest tunnel --url http://localhost:4321",
+    "build": "astro build",
+    "preview": "astro preview",
+    "typecheck": "astro check",
+    "clean": "rm -rf dist .astro",
+    "css:check": "stylelint \"src/**/*.{css,scss,astro}\"",
+    "css:fix": "stylelint --fix \"src/**/*.{css,scss,astro}\"",
+    "prettier:check": "prettier --check . \"!blog/**\"",
+    "prettier:fix": "prettier --write . \"!blog/**\""
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@iconify-json/mdi": "^1.2.3",
+    "astro": "^6.3.1",
+    "astro-icon": "^1.1.5",
+    "concurrently": "^9.2.1",
+    "postcss-html": "^1.8.0",
+    "prettier": "^3.8.3",
+    "prettier-plugin-astro": "^0.14.1",
+    "sass": "^1.99.0",
+    "stylelint": "^17.10.0",
+    "stylelint-config-hudochenkov": "^13.0.2",
+    "stylelint-config-standard-scss": "^17.0.0",
+    "stylelint-order": "^8.1.1",
+    "typescript": "^6.0.3"
+  }
+}

@@ -1,0 +1,80 @@
+---
+import config from '@/config';
+
+const navLinks = [
+  { label: '홈', href: '/' },
+  { label: '주제별', href: '/archive' },
+  { label: '날짜별', href: '/latest' },
+];
+const { activeLinkIndex } = Astro.props;
+const { site } = config;
+---
+
+<header class="header">
+  <a class="title" href="/">{site.title}</a>
+
+  <nav class="nav">
+    <ul class="list">
+      {
+        navLinks.map((link, index) => (
+          <li class="item">
+            <a
+              class:list={['link', { 'link--active': activeLinkIndex === index }]}
+              href={link.href}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>
+
+<style lang="scss">
+  .header {
+    display: flex;
+    justify-content: space-between;
+    padding: $space-6 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .title {
+    font-weight: $font-weight-semibold;
+    font-size: $font-size-18;
+  }
+
+  .list {
+    display: flex;
+    gap: $space-6;
+  }
+
+  .link {
+    color: var(--text-muted);
+    font-weight: $font-weight-medium;
+    font-size: $font-size-15;
+    transition: all $transition-duration-1;
+
+    &:hover {
+      color: var(--text-heading);
+      font-weight: $font-weight-semibold;
+    }
+
+    &--active {
+      position: relative;
+      color: var(--text-heading);
+      font-weight: $font-weight-semibold;
+
+      &::before {
+        content: '';
+        position: absolute;
+        bottom: -6px;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background-color: var(--text-heading);
+        transform: scaleX(1.2);
+      }
+    }
+  }
+</style>

@@ -1,0 +1,87 @@
+---
+import RootLayout from './RootLayout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+
+const { title } = Astro.props;
+---
+
+<RootLayout title={title}>
+  <div class="post-page">
+    <div class="container">
+      <Header />
+    </div>
+
+    <main class="post-columns">
+      <div class="post-columns__body">
+        <slot name="body" />
+      </div>
+      <div class="post-columns__toc">
+        <slot name="toc" />
+      </div>
+    </main>
+
+    <div class="container">
+      <Footer />
+    </div>
+  </div>
+</RootLayout>
+
+<style lang="scss">
+  .post-page {
+    @include media-down('lg') {
+      padding: 0 $space-8;
+    }
+
+    @include media-down('md') {
+      padding: 0 $space-6;
+    }
+  }
+
+  .container {
+    max-width: $container-width;
+    margin: 0 auto;
+  }
+
+  .post-columns {
+    display: grid;
+    grid-template-columns:
+      calc((100% - #{$container-width}) / 2)
+      [body-start] $container-width
+      [body-end toc-start] 280px
+      [toc-end];
+
+    @media (width <= 1700px) {
+      grid-template-columns:
+        calc((100% - #{$container-width}) / 2)
+        [body-start] minmax(0, 1fr)
+        [body-end toc-start] 280px
+        [toc-end] $space-8;
+    }
+
+    @include media-down('lg') {
+      grid-template-rows: auto auto;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    &__body {
+      grid-column: body-start / body-end;
+
+      @include media-down('lg') {
+        grid-row: 2;
+        grid-column: 1 / -1;
+      }
+    }
+
+    &__toc {
+      grid-column: toc-start / toc-end;
+      margin-left: 2rem;
+
+      @include media-down('lg') {
+        grid-row: 1;
+        grid-column: 1 / -1;
+        margin-left: 0;
+      }
+    }
+  }
+</style>

@@ -1,0 +1,48 @@
+---
+import type { TocItem } from '@/types/toc';
+
+interface Props {
+  items: TocItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<ul>
+  {
+    items.map(({ heading, children }) => (
+      <li>
+        <a href={`#${heading.slug}`}>{heading.text}</a>
+        {children.length > 0 && <Astro.self items={children} />}
+      </li>
+    ))
+  }
+</ul>
+
+<style lang="scss">
+  ul {
+    display: grid;
+    gap: $space-1;
+  }
+
+  ul ul {
+    margin-top: $space-1;
+    margin-left: $space-2;
+    padding-left: $space-2;
+  }
+
+  a {
+    display: inline-block;
+    padding: $space-1 0;
+    color: var(--text-muted);
+    font-size: $font-size-14;
+    line-height: $line-height-tight;
+    transition: all $transition-duration-1;
+  }
+
+  a:hover,
+  a:focus-visible,
+  a.active {
+    color: var(--accent);
+  }
+</style>

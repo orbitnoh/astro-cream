@@ -1,0 +1,11 @@
+/* stylelint-disable */
+
+@use 'sass:map';
+@use './variables' as variables;
+
+// CSS Modules export bridge for JavaScript imports.
+:export {
+  breakpointLg: #{map.get(variables.$breakpoints, 'lg')};
+  breakpointMd: #{map.get(variables.$breakpoints, 'md')};
+  breakpointSm: #{map.get(variables.$breakpoints, 'sm')};
+}

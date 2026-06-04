@@ -1,0 +1,27 @@
+@use 'sass:map';
+@use './tokens/variables' as *;
+
+@mixin media-down($name) {
+  $breakpoint: map.get($breakpoints, $name);
+
+  @if not $breakpoint {
+    @error "Unknown breakpoint `#{$name}`.";
+  }
+
+  @media (max-width: #{$breakpoint}) {
+    @content;
+  }
+}
+
+@mixin text-ellipsis($line: 1) {
+  @if $line == 1 {
+    white-space: nowrap;
+  } @else {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: $line;
+  }
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

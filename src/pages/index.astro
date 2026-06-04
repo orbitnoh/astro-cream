@@ -1,0 +1,166 @@
+---
+import DefaultLayout from '@/layouts/DefaultLayout.astro';
+---
+
+<DefaultLayout activeLinkIndex={0} title="Home">
+  <section class="intro">
+    <h1 class="intro__title">
+      Markdown으로 기록하고
+      <br />
+      Astro로 빌드하는 블로그 템플릿입니다.
+    </h1>
+
+    <div class="intro__description">
+      <p>
+        주제와 날짜, 두 가지 방식으로
+        <br />
+        기록의 흐름을 살펴볼 수 있습니다.
+      </p>
+    </div>
+  </section>
+
+  <section class="card-group" aria-labelledby="card-group-title">
+    <h2 id="card-group-title" class="sr-only">글 탐색</h2>
+
+    <a href="/archive" class="card">
+      <h3 class="card__title">주제별</h3>
+      <p class="card__description">
+        목차에 작성한 순서대로
+        <br />
+        글을 주제별로 묶어 보여줍니다.
+      </p>
+      <span class="card__button">주제별 보기 </span>
+    </a>
+
+    <a href="/latest" class="card">
+      <h3 class="card__title">날짜별</h3>
+      <p class="card__description">
+        날짜를 기준으로
+        <br />
+        최신 글 순으로 보여줍니다.
+      </p>
+      <span class="card__button">날짜별 보기 </span>
+    </a>
+  </section>
+</DefaultLayout>
+
+<style lang="scss">
+  .intro {
+    padding: $space-12 0;
+
+    @include media-down('md') {
+      padding: $space-10 0;
+    }
+
+    @include media-down('sm') {
+      padding: $space-8 0;
+    }
+
+    &__title {
+      font-size: $font-size-32;
+
+      @include media-down('md') {
+        font-size: $font-size-26;
+      }
+
+      @include media-down('sm') {
+        font-size: $font-size-24;
+      }
+    }
+
+    &__description {
+      padding-top: $space-8;
+
+      @include media-down('md') {
+        padding-top: $space-6;
+      }
+
+      p + p {
+        margin-top: $space-4;
+
+        @include media-down('sm') {
+          margin-top: $space-3;
+        }
+      }
+    }
+  }
+
+  .card-group {
+    display: flex;
+    gap: $space-8;
+    padding: $space-12 0;
+    border-top: 1px solid var(--border);
+
+    @include media-down('md') {
+      flex-direction: column;
+      gap: $space-6;
+      padding: $space-10 0;
+    }
+
+    @include media-down('sm') {
+      padding: $space-8 0;
+    }
+  }
+
+  .card {
+    $self: &;
+
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 19rem;
+    padding: $space-8 $space-9;
+    border: 1px solid var(--border);
+    background: var(--bg-surface);
+    transition: all $transition-duration-1;
+
+    @include media-down('md') {
+      min-height: 15rem;
+      padding: $space-6;
+    }
+
+    @include media-down('sm') {
+      min-height: 12rem;
+      padding: $space-5;
+    }
+
+    &__title {
+      font-size: $font-size-24;
+
+      @include media-down('sm') {
+        font-size: $font-size-22;
+      }
+    }
+
+    &__description {
+      margin-top: $space-3;
+      color: var(--text-muted);
+      font-size: $font-size-15;
+    }
+
+    &__button {
+      align-self: flex-start;
+      margin-top: auto;
+      padding: $space-2 $space-4;
+      background: var(--text-heading);
+      color: var(--bg-surface);
+      font-weight: $font-weight-bold;
+      font-size: $font-size-14;
+      transition: all $transition-duration-1;
+
+      &:hover {
+        background-color: var(--accent);
+      }
+    }
+
+    &:hover {
+      box-shadow: 0 12px 32px color-mix(in srgb, var(--text-body) 10%, transparent);
+
+      #{$self}__button {
+        background-color: var(--accent);
+        transform: translateX(2px);
+      }
+    }
+  }
+</style>

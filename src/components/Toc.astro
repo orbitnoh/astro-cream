@@ -1,0 +1,145 @@
+---
+import type { MarkdownHeading } from 'astro';
+import type { TocItem } from '@/types/toc';
+import TocItems from './TocItems.astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+const buildTocTree = (headings: MarkdownHeading[]): TocItem[] => {
+  const tocTree: TocItem[] = [];
+  const stack: { depth: number; children: TocItem[] }[] = [{ depth: 1, children: tocTree }];
+
+  for (const heading of headings) {
+    const item: TocItem = { heading, children: [] };
+
+    while (stack.length > 1 && stack[stack.length - 1].depth >= heading.depth) {
+      stack.pop();
+    }
+
+    stack[stack.length - 1].children.push(item);
+    stack.push({ depth: heading.depth, children: item.children });
+  }
+
+  return tocTree;
+};
+
+const headings = Astro.props.headings.filter(({ depth }) => depth > 1) ?? [];
+const tocTree = buildTocTree(headings);
+---
+
+<aside class="toc" data-toc>
+  <h2 id="toc-title" class="toc__title">CONTENTS</h2>
+  {
+    tocTree.length > 0 && (
+      <nav aria-labelledby="toc-title">
+        <TocItems items={tocTree} />
+      </nav>
+    )
+  }
+</aside>
+
+<script>
+  import tokens from '@/styles/tokens/js.module.scss';
+
+  const mediaQuery = window.matchMedia(`(max-width: ${tokens.breakpointLg})`);
+
+  let observer: IntersectionObserver | null = null;
+  let headingEls: HTMLHeadingElement[] | null = null;
+  let tocLinkEls: HTMLAnchorElement[] | null = null;
+  let tocLinkElByHeadingId: Map<string, HTMLAnchorElement> | null = null;
+
+  const initElements = () => {
+    if (headingEls && tocLinkEls && tocLinkElByHeadingId) return;
+
+    const toc = document.querySelector<HTMLElement>('[data-toc]');
+    const markdownContent = document.querySelector<HTMLElement>('[data-markdown-content]');
+
+    if (!toc || !markdownContent) {
+      throw new Error(
+        'Missing [data-toc] or [data-markdown-content] attribute on required elements.',
+      );
+    }
+
+    headingEls = Array.from(
+      markdownContent.querySelectorAll<HTMLHeadingElement>('h2, h3, h4, h5, h6'),
+    );
+    tocLinkEls = Array.from(toc.querySelectorAll<HTMLAnchorElement>('a[href^="#"]'));
+    tocLinkElByHeadingId = new Map(
+      tocLinkEls.map((tocLinkEl) => [decodeURIComponent(tocLinkEl.hash.slice(1)), tocLinkEl]),
+    );
+  };
+
+  const disconnectObserver = () => {
+    observer?.disconnect();
+    observer = null;
+
+    tocLinkEls?.forEach((tocLinkEl) => {
+      tocLinkEl.classList.remove('active');
+    });
+  };
+
+  const onHeadingIntersect = (entries: IntersectionObserverEntry[]) => {
+    entries.forEach((entry) => {
+      const headingId = entry.target.id;
+      const activeLinkEl = tocLinkElByHeadingId?.get(headingId);
+
+      if (!activeLinkEl) return;
+
+      if (entry.isIntersecting) {
+        activeLinkEl.classList.add('active');
+      } else {
+        activeLinkEl.classList.remove('active');
+      }
+    });
+  };
+
+  const connectObserver = () => {
+    if (observer) throw new Error('Observer is already connected.');
+
+    initElements();
+
+    observer = new IntersectionObserver(onHeadingIntersect, {
+      threshold: 0.1,
+    });
+
+    headingEls?.forEach((headingEl) => observer?.observe(headingEl));
+  };
+
+  const syncObserver = () => {
+    if (mediaQuery.matches) {
+      disconnectObserver();
+    } else {
+      connectObserver();
+    }
+  };
+
+  mediaQuery.addEventListener('change', syncObserver);
+  syncObserver();
+</script>
+
+<style lang="scss">
+  .toc {
+    position: sticky;
+    top: 150px;
+    padding-left: $space-6;
+    border-left: 1px solid var(--border);
+
+    @include media-down('lg') {
+      padding: $space-6 0;
+      border-bottom: 1px solid var(--border);
+      border-left: 0;
+    }
+
+    &__title {
+      font-size: $font-size-14;
+      line-height: $line-height-none;
+      letter-spacing: 0.06em;
+    }
+  }
+
+  .toc nav {
+    margin-top: $space-3;
+  }
+</style>

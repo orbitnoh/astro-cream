@@ -1,0 +1,62 @@
+---
+import { Icon } from 'astro-icon/components';
+import config from '@/config';
+
+const socialIconNames = {
+  github: 'mdi:github',
+  mail: 'mdi:email-outline',
+};
+---
+
+<footer class="footer">
+  <nav class="nav">
+    <ul class="list">
+      {
+        config.socials.map((social) => (
+          <li class="item">
+            <a class="link" href={social.url}>
+              <Icon name={socialIconNames[social.name]} class="icon" />
+              <span class="label">{social.name}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</footer>
+
+<style lang="scss">
+  .footer {
+    padding: $space-6 0;
+    border-top: 1px solid var(--border);
+
+    @include media-down('sm') {
+      padding: $space-4 0;
+    }
+  }
+
+  .list {
+    display: flex;
+    gap: $space-4;
+    justify-content: end;
+  }
+
+  .link {
+    display: flex;
+    gap: $space-2;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .icon,
+  .label {
+    color: var(--text-muted);
+    font-weight: $font-weight-medium;
+    font-size: $font-size-14;
+    transition: $transition-duration-1;
+
+    .link:hover & {
+      color: var(--text-heading);
+    }
+  }
+</style>

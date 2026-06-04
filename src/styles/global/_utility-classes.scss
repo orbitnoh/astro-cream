@@ -1,0 +1,31 @@
+@use '../mixins' as *;
+
+.sr-only {
+  position: absolute;
+  overflow: hidden;
+  clip-path: inset(50%);
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  white-space: nowrap;
+}
+
+.sm-hidden {
+  @include media-down('sm') {
+    display: none;
+  }
+}
+
+.md-hidden {
+  @include media-down('md') {
+    display: none;
+  }
+}
+
+.lg-hidden {
+  @include media-down('lg') {
+    display: none;
+  }
+}

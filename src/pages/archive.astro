@@ -1,0 +1,404 @@
+---
+import DefaultLayout from '@/layouts/DefaultLayout.astro';
+import archiveMarkdown from '../../blog/archive.md?raw';
+
+interface Post {
+  title: string;
+  slug: string;
+}
+
+interface Section {
+  heading: string;
+  posts: Post[];
+}
+
+const parseArchive = (source: string): Section[] => {
+  const LINK_REGEX = /^- \[([^\]]+)\]\(\.\/posts\/(.+?)\.md\)/;
+  const PRIVATE_REGEX = /<!--\s*private\s*-->/;
+
+  const lines = source.split(/\r?\n/);
+
+  if (lines[lines.length - 1] === '') {
+    lines.pop();
+  }
+
+  const archiveSections: Section[] = [];
+  let currentSection: Section | null = null;
+
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].startsWith('#')) {
+      currentSection = {
+        heading: lines[i].replace('#', '').trim(),
+        posts: [],
+      };
+
+      archiveSections.push(currentSection);
+      continue;
+    }
+
+    if (lines[i].startsWith('-')) {
+      const linkMatch = lines[i].match(LINK_REGEX);
+
+      if (linkMatch === null) {
+        continue;
+      }
+
+      if (currentSection === null) {
+        throw new Error(`Archive item has no heading: ${lines[i]}`);
+      }
+
+      const [, title, slug] = linkMatch;
+      const isPrivate = PRIVATE_REGEX.test(lines[i]);
+
+      if (import.meta.env.PROD && isPrivate) {
+        continue;
+      }
+
+      currentSection.posts.push({
+        title,
+        slug: `/posts/${slug}`,
+      });
+    }
+  }
+
+  return archiveSections.filter(
+    (section) => section.posts.length > 0 && !(import.meta.env.PROD && section.heading === 'Inbox'),
+  );
+};
+
+const archiveSections = parseArchive(archiveMarkdown);
+const totalPostCount = archiveSections.reduce((total, section) => total + section.posts.length, 0);
+---
+
+<DefaultLayout activeLinkIndex={1} title="주제별">
+  <div class="archive">
+    <section class="intro">
+      <div class="intro__content">
+        <span class="intro__eyebrow">Archive</span>
+        <h1 class="intro__title">
+          생각을 발산하고<br />
+          주제별로 펼쳐보세요.
+        </h1>
+        <p class="intro__description">아이디어와 기록을 주제별로 모아 빠르게 탐색할 수 있습니다.</p>
+      </div>
+      <div class="intro__stats">
+        <span class="intro__post-count">{totalPostCount}개의 글</span>
+        <span class="intro__archive-count">{archiveSections.length}개의 주제</span>
+      </div>
+    </section>
+
+    <div class="body">
+      <div class="content" aria-labelledby="content-title">
+        <h2 id="content-title" class="sr-only">주제별 글 목록</h2>
+        {
+          archiveSections.map((section) => (
+            <section id={section.heading} class="archive-section">
+              <header class="archive-section__header">
+                <h2 class="archive-section__title">{section.heading}</h2>
+                <span class="archive-section__post-count">{section.posts.length} links</span>
+              </header>
+              <ol>
+                {section.posts.map((post, index) => (
+                  <li>
+                    <a href={post.slug} class="archive-section__post-link">
+                      <span class="archive-section__post-index">
+                        {String(index + 1).padStart(
+                          Math.max(2, section.posts.length.toString().length),
+                          '0',
+                        )}
+                      </span>
+                      <span class="archive-section__post-title">{post.title}</span>
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ))
+        }
+      </div>
+
+      <aside class="toc">
+        <h2 class="toc__heading">CONTENTS</h2>
+        <ol class="toc__list">
+          {
+            archiveSections.map((section) => (
+              <li>
+                <a href={`#${section.heading}`} class="toc__link">
+                  <span class="toc__archive-title">{section.heading}</span>
+                  <span class="toc__post-count">{section.posts.length}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </aside>
+    </div>
+  </div>
+</DefaultLayout>
+
+<style lang="scss">
+  .archive {
+    padding: $space-12 0 $space-16;
+
+    @include media-down('md') {
+      padding: $space-10 0 $space-12;
+    }
+
+    @include media-down('sm') {
+      padding: $space-6 0 $space-10;
+    }
+  }
+
+  .intro {
+    display: grid;
+    grid-template-columns: 1fr auto;
+
+    @include media-down('md') {
+      grid-template-columns: 1fr;
+    }
+
+    &__eyebrow {
+      display: block;
+      color: var(--text-muted);
+      font-weight: $font-weight-semibold;
+      font-size: $font-size-14;
+      line-height: $line-height-tight;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    &__title {
+      margin-top: $space-3;
+      font-size: $font-size-32;
+
+      @include media-down('md') {
+        font-size: $font-size-26;
+      }
+
+      @include media-down('sm') {
+        margin-top: $space-2;
+        font-size: $font-size-24;
+      }
+    }
+
+    &__description {
+      margin-top: $space-5;
+      color: var(--text-muted);
+
+      @include media-down('sm') {
+        margin-top: $space-3;
+      }
+    }
+
+    &__stats {
+      align-self: end;
+      padding: $space-5;
+      border: 1px solid var(--border);
+      background-color: var(--bg-surface);
+
+      @include media-down('md') {
+        display: flex;
+        gap: $space-3;
+        align-items: center;
+        margin-top: $space-4;
+        padding: $space-4 0 0;
+        border: 0;
+        border-top: 1px solid var(--border);
+        background-color: transparent;
+      }
+    }
+
+    &__post-count,
+    &__archive-count {
+      display: block;
+      line-height: $line-height-tight;
+      text-align: right;
+
+      @include media-down('md') {
+        text-align: left;
+      }
+    }
+
+    &__post-count {
+      color: var(--text-heading);
+      font-weight: $font-weight-bold;
+      font-size: $font-size-20;
+
+      @include media-down('md') {
+        font-size: $font-size-14;
+      }
+    }
+
+    &__archive-count {
+      margin-top: $space-2;
+      color: var(--text-muted);
+      font-weight: $font-weight-medium;
+      font-size: $font-size-14;
+
+      @include media-down('md') {
+        margin-top: 0;
+
+        &::before {
+          content: '/';
+          margin-right: $space-3;
+          color: var(--marker);
+        }
+      }
+    }
+  }
+
+  .body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(180px, 22%, 220px);
+    gap: clamp($space-8, 6vw, $space-20);
+    margin-top: $space-8;
+    padding-top: $space-10;
+    border-top: 1px solid var(--border);
+
+    @include media-down('md') {
+      grid-template-columns: 1fr;
+      gap: $space-8;
+      margin-top: $space-4;
+      padding: 0;
+      border-top: none;
+
+      > .toc {
+        order: -1;
+      }
+    }
+
+    @include media-down('sm') {
+      gap: $space-6;
+    }
+  }
+
+  .archive-section {
+    $self: &;
+
+    & + & {
+      margin-top: $space-10;
+
+      @include media-down('sm') {
+        margin-top: $space-6;
+      }
+    }
+
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: $space-2;
+      border-bottom: 1px solid var(--border);
+    }
+
+    &__title {
+      font-size: $font-size-22;
+    }
+
+    &__post-count {
+      color: var(--text-muted);
+      font-weight: $font-weight-medium;
+      font-size: $font-size-13;
+    }
+
+    &__post-link {
+      position: relative;
+      display: flex;
+      gap: $space-10;
+      align-items: center;
+      padding: $space-2 $space-3;
+      border-bottom: 1px solid color-mix(in srgb, var(--border) 65%, #fff 35%);
+      transition:
+        background-color $transition-duration-1,
+        box-shadow $transition-duration-1;
+
+      &:hover {
+        background-color: var(--bg-surface);
+        box-shadow: inset 3px 0 0 var(--accent);
+
+        #{$self}__post-index {
+          color: var(--accent);
+          transform: translateX(2px);
+        }
+
+        #{$self}__post-title {
+          color: var(--text-heading);
+          transform: translateX(2px);
+        }
+      }
+    }
+
+    &__post-index {
+      color: var(--marker);
+      font-weight: $font-weight-medium;
+      font-size: $font-size-12;
+      line-height: $line-height-tight;
+      transition: all $transition-duration-1;
+    }
+
+    &__post-title {
+      @include text-ellipsis;
+
+      min-width: 0;
+      font-weight: $font-weight-semibold;
+      font-size: $font-size-15;
+      line-height: $line-height-tight;
+      transition: all $transition-duration-1;
+    }
+  }
+
+  .toc {
+    $self: &;
+
+    position: sticky;
+    align-self: start;
+    padding: $space-5;
+    border: 1px solid var(--border);
+    background-color: var(--bg-surface);
+
+    &__heading {
+      font-weight: $font-weight-bold;
+      font-size: $font-size-12;
+      line-height: $line-height-none;
+      letter-spacing: 0.06em;
+    }
+
+    &__list {
+      display: flex;
+      flex-direction: column;
+      gap: $space-2;
+      margin-top: $space-3;
+    }
+
+    &__link {
+      display: flex;
+      justify-content: space-between;
+
+      &:hover {
+        #{$self}__archive-title,
+        #{$self}__post-count {
+          color: var(--accent);
+        }
+      }
+    }
+
+    &__post-count,
+    &__archive-title {
+      font-weight: $font-weight-medium;
+      line-height: $line-height-tight;
+      transition: color $transition-duration-1;
+    }
+
+    &__archive-title {
+      @include text-ellipsis;
+
+      color: var(--text-muted);
+      font-size: $font-size-13;
+    }
+
+    &__post-count {
+      color: var(--marker);
+      font-size: $font-size-12;
+    }
+  }
+</style>
