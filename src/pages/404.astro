@@ -1,0 +1,60 @@
+---
+import DefaultLayout from '@/layouts/DefaultLayout.astro';
+---
+
+<DefaultLayout title="Not Found">
+  <div class="not-found">
+    <span class="not-found__code">404</span>
+    <h1 class="not-found__title">Page not found</h1>
+    <p class="not-found__description">
+      The page you requested does not exist or may have been moved.
+    </p>
+  </div>
+</DefaultLayout>
+
+<style lang="scss">
+  .not-found {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+    min-height: 50dvh;
+    padding: $space-16 0;
+    text-align: center;
+
+    @include media-down('sm') {
+      min-height: 45vh;
+      min-height: 45dvh;
+      padding: $space-12 0;
+    }
+
+    &__code {
+      color: var(--marker);
+      font-weight: $font-weight-bold;
+      font-size: 5rem;
+      line-height: $line-height-tight;
+    }
+
+    &__title {
+      margin-top: $space-2;
+      font-size: $font-size-26;
+
+      @include media-down('sm') {
+        font-size: $font-size-22;
+      }
+    }
+
+    &__description {
+      margin-top: $space-5;
+      color: var(--text-muted);
+      font-weight: $font-weight-medium;
+
+      @include media-down('sm') {
+        max-width: 32ch;
+        margin-top: $space-3;
+        font-size: $font-size-15;
+      }
+    }
+  }
+</style>
