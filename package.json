@@ -14,13 +14,15 @@
     "dev:public": "concurrently -k -n astro,tunnel \"npm run dev:host\" \"npm run tunnel\"",
     "tunnel": "npx --yes cloudflared@latest tunnel --url http://localhost:4321",
     "build": "astro build",
-    "preview": "astro preview",
+    "preview": "npm run build && wrangler dev",
     "typecheck": "astro check",
     "clean": "rm -rf dist .astro",
     "css:check": "stylelint \"src/**/*.{css,scss,astro}\"",
     "css:fix": "stylelint --fix \"src/**/*.{css,scss,astro}\"",
     "prettier:check": "prettier --check . \"!blog/**\"",
-    "prettier:fix": "prettier --write . \"!blog/**\""
+    "prettier:fix": "prettier --write . \"!blog/**\"",
+    "generate-types": "wrangler types",
+    "deploy": "npm run build && wrangler deploy"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
@@ -36,6 +38,13 @@
     "stylelint-config-hudochenkov": "^13.0.2",
     "stylelint-config-standard-scss": "^17.0.0",
     "stylelint-order": "^8.1.1",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "wrangler": "^4.98.0"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^13.6.1"
+  },
+  "overrides": {
+    "vite": "^7"
   }
 }
