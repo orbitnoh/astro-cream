@@ -251,8 +251,18 @@ const { Content, headings } = await render(post);
 
     hr {
       height: 1px;
+      margin-top: $space-8;
+      margin-bottom: $space-8;
       border: 0;
       background-color: var(--border);
+    }
+
+    hr + h2,
+    hr + h3,
+    hr + h4,
+    hr + h5,
+    hr + h6 {
+      margin-top: 0;
     }
   }
 </style>
