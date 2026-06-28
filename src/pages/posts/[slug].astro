@@ -199,6 +199,12 @@ const { Content, headings } = await render(post);
       }
     }
 
+    code,
+    pre,
+    pre code {
+      font-variant-ligatures: none;
+    }
+
     code:not(pre code) {
       padding: 0.1em 0.4em;
       background-color: #f1ece0;
