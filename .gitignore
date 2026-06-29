@@ -23,7 +23,16 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
+# local todos
+todo.md
+TODO.md
+
 # AI
-.codex
-.agents
+.codex/
+.agents/
+.claude/
+.gemini/
 CLAUDE.md
+AGENTS.md
+AGENTS.override.md
+GEMINI.md
