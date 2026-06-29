@@ -1,6 +1,7 @@
 # 가이드
 
 - [블로그 컨셉](./posts/blog-concept.md)
+- [LaTeX](./posts/latex.md)
 
 # 비공개 글
 
