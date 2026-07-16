@@ -87,7 +87,7 @@ const { Content, headings } = await render(post);
       margin-top: $space-8;
 
       &::before {
-        content: '|';
+        content: '';
         margin-right: $space-2;
         color: color-mix(in srgb, var(--accent) 80%, transparent 20%);
         font-weight: $font-weight-medium;
@@ -109,6 +109,10 @@ const { Content, headings } = await render(post);
     h3 {
       font-size: $font-size-22;
 
+      &::before {
+        content: '|';
+      }
+
       @include media-down('sm') {
         font-size: $font-size-20;
       }
@@ -116,15 +120,27 @@ const { Content, headings } = await render(post);
 
     h4 {
       font-size: $font-size-20;
+
+      &::before {
+        content: '\2013'; // U+2013 en dash
+      }
     }
 
     h5 {
       font-size: $font-size-18;
+
+      &::before {
+        content: '\00b7'; // U+00B7 middle dot
+      }
     }
 
     h6 {
       color: var(--text-muted);
       font-size: $font-size-16;
+
+      &::before {
+        content: '\25e6'; // U+25E6 white bullet
+      }
     }
 
     p,
